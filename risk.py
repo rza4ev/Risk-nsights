@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
-import joblib
+import pickle
 import os
+
 # Encoding mappings
 process_name_map = {
     'Customer Support': 0, 'Data Management': 1, 'Financial Reporting': 2, 'IT Support': 3,
@@ -37,11 +38,11 @@ process_frequency_map = {
     'Daily': 0, 'Monthly': 1, 'Quarterly': 2, 'Weekly': 3, 'Yearly': 4
 }
 
-
 model_filename = os.path.join(os.path.dirname(__file__), 'etc_model.pkl')
 
 if os.path.exists(model_filename):
-    model = joblib.load(model_filename)
+    with open(model_filename, 'rb') as file:
+        model = pickle.load(file)
 else:
     raise FileNotFoundError(f"Model file not found: {model_filename}")
 
@@ -76,8 +77,6 @@ encoded_data = [
     control_score
 ]
 
-# def dict_to_dataframe(dict):
-
 # Convert to DataFrame
 features = pd.DataFrame([encoded_data], columns=[
     'ProcessName', 'ProcessDescription', 'PotentialRisk', 'RiskImpact',
@@ -89,3 +88,4 @@ features = pd.DataFrame([encoded_data], columns=[
 if st.button('Predict Risk Likelihood'):
     prediction = model.predict(features)
     st.write('Predicted Risk Likelihood:', prediction[0])
+
