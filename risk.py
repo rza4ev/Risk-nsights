@@ -37,9 +37,15 @@ process_frequency_map = {
     'Daily': 0, 'Monthly': 1, 'Quarterly': 2, 'Weekly': 3, 'Yearly': 4
 }
 
-# Load the model
-model_filename = r'C:\Users\MSI GF75\Desktop\Niyyat\IrshadEelec\etc_model.pkl'
-model = joblib.load(model_filename)
+import os
+import joblib
+
+model_filename = 'etc_model.pkl'
+
+if os.path.exists(model_filename):
+    model = joblib.load(model_filename)
+else:
+    raise FileNotFoundError(f"Model file not found: {model_filename}")
 
 # Streamlit app
 st.title('Risk Likelihood Prediction')
