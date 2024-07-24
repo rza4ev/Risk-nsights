@@ -1,7 +1,18 @@
+import os
+import pickle
 import streamlit as st
 import pandas as pd
-import pickle
-import os
+
+# Define the path to the model file
+model_file = 'extra_trees_model.pkl'  # Assuming it's in the same directory as your script
+
+# Check if the model file exists
+if os.path.isfile(model_file):
+    # Load the model
+    with open(model_file, 'rb') as file:
+        model = pickle.load(file)
+else:
+    st.error("Model file not found. Please make sure the file is in the same directory as this script.")
 
 # Encoding mappings
 process_name_map = {
@@ -38,59 +49,49 @@ process_frequency_map = {
     'Daily': 0, 'Monthly': 1, 'Quarterly': 2, 'Weekly': 3, 'Yearly': 4
 }
 
-model_file = 'extra_trees_model.pkl'  # Assuming it's in the same directory as your script
+# Streamlit app
+st.title('Risk Likelihood Prediction')
 
-# Check if the model file exists
-if os.path.isfile(model_file):
-    # Load the model
-    with open(model_file, 'rb') as file:
-        model = pickle.load(file)
-else:
-    st.error("Model file not found. Please make sure the file is in the same directory as this script.")
+# User inputs
+process_name = st.selectbox('Select Process Name', list(process_name_map.keys()))
+process_description = st.selectbox('Select Process Description', list(process_description_map.keys()))
+potential_risk = st.selectbox('Select Potential Risk', list(potential_risk_map.keys()))
+risk_impact = st.number_input('Enter Risk Impact', min_value=1, max_value=3, step=1)
+control_measure = st.selectbox('Select Control Measure', list(control_measure_map.keys()))
+control_effectiveness = st.number_input('Enter Control Effectiveness', min_value=1, max_value=3, step=1)
+department = st.selectbox('Select Department', list(department_map.keys()))
+process_frequency = st.selectbox('Select Process Frequency', list(process_frequency_map.keys()))
+process_criticality = st.number_input('Enter Process Criticality', min_value=1, max_value=3, step=1)
+risk_score = st.number_input('Enter Risk Score', min_value=1, max_value=9, step=1)
+control_score = st.number_input('Enter Control Score', min_value=1, max_value=9, step=1)
 
-    
-    # Streamlit app
-    st.title('Risk Likelihood Prediction')
+# Encoding the inputs
+encoded_data = [
+    process_name_map[process_name],
+    process_description_map[process_description],
+    potential_risk_map[potential_risk],
+    risk_impact,
+    control_measure_map[control_measure],
+    control_effectiveness,
+    department_map[department],
+    process_frequency_map[process_frequency],
+    process_criticality,
+    risk_score,
+    control_score
+]
 
-    # User inputs
-    process_name = st.selectbox('Select Process Name', list(process_name_map.keys()))
-    process_description = st.selectbox('Select Process Description', list(process_description_map.keys()))
-    potential_risk = st.selectbox('Select Potential Risk', list(potential_risk_map.keys()))
-    risk_impact = st.number_input('Enter Risk Impact', min_value=1, max_value=3, step=1)
-    control_measure = st.selectbox('Select Control Measure', list(control_measure_map.keys()))
-    control_effectiveness = st.number_input('Enter Control Effectiveness', min_value=1, max_value=3, step=1)
-    department = st.selectbox('Select Department', list(department_map.keys()))
-    process_frequency = st.selectbox('Select Process Frequency', list(process_frequency_map.keys()))
-    process_criticality = st.number_input('Enter Process Criticality', min_value=1, max_value=3, step=1)
-    risk_score = st.number_input('Enter Risk Score', min_value=1, max_value=9, step=1)
-    control_score = st.number_input('Enter Control Score', min_value=1, max_value=9, step=1)
+# Convert to DataFrame
+features = pd.DataFrame([encoded_data], columns=[
+    'ProcessName', 'ProcessDescription', 'PotentialRisk', 'RiskImpact',
+    'ControlMeasure', 'ControlEffectiveness', 'Department', 'ProcessFrequency',
+    'ProcessCriticality', 'RiskScore', 'ControlScore'
+])
 
-    # Encoding the inputs
-    encoded_data = [
-        process_name_map[process_name],
-        process_description_map[process_description],
-        potential_risk_map[potential_risk],
-        risk_impact,
-        control_measure_map[control_measure],
-        control_effectiveness,
-        department_map[department],
-        process_frequency_map[process_frequency],
-        process_criticality,
-        risk_score,
-        control_score
-    ]
-
-    # Convert to DataFrame
-    features = pd.DataFrame([encoded_data], columns=[
-        'ProcessName', 'ProcessDescription', 'PotentialRisk', 'RiskImpact',
-        'ControlMeasure', 'ControlEffectiveness', 'Department', 'ProcessFrequency',
-        'ProcessCriticality', 'RiskScore', 'ControlScore'
-    ])
-
-    # Predict button
-    if st.button('Predict Risk Likelihood'):
+# Predict button
+if st.button('Predict Risk Likelihood'):
+    if 'model' in locals():  # Check if the model has been loaded
         prediction = model.predict(features)
         st.write('Predicted Risk Likelihood:', prediction[0])
-else:
-    st.error(f"Model dosyası '{model_file}' bulunamadı. Lütfen dosyanın doğru dizinde olduğundan emin olun.")
+    else:
+        st.error("Model is not loaded. Please check the model file.")
 
