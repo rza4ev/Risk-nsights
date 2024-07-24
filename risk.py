@@ -84,8 +84,15 @@ features = pd.DataFrame([encoded_data], columns=[
     'ProcessCriticality', 'RiskScore', 'ControlScore'
 ])  
 
+# Debugging information
+st.write('Feature DataFrame Shape:', features.shape)
+st.write('Model Type:', type(model))
+
 # Predict button
 if st.button('Predict Risk Likelihood'):
-    prediction = model.predict(features)
-    st.write('Predicted Risk Likelihood:', prediction[0])
+    try:
+        prediction = model.predict(features)
+        st.write('Predicted Risk Likelihood:', prediction[0])
+    except Exception as e:
+        st.write('Error during prediction:', str(e))
 
