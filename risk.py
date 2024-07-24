@@ -37,10 +37,8 @@ process_frequency_map = {
     'Daily': 0, 'Monthly': 1, 'Quarterly': 2, 'Weekly': 3, 'Yearly': 4
 }
 
-import os
-import joblib
 
-model_filename = 'etc_model.pkl'
+model_filename = os.path.join(os.path.dirname(__file__), 'etc_model.pkl')
 
 if os.path.exists(model_filename):
     model = joblib.load(model_filename)
