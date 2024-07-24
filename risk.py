@@ -38,13 +38,16 @@ process_frequency_map = {
     'Daily': 0, 'Monthly': 1, 'Quarterly': 2, 'Weekly': 3, 'Yearly': 4
 }
 
-model_file = 'C:/Users/MSI GF75/Desktop/Niyyat/IrshadEelec/extra_trees_model.pkl'
+model_file = 'extra_trees_model.pkl'  # Assuming it's in the same directory as your script
 
 # Check if the model file exists
 if os.path.isfile(model_file):
     # Load the model
     with open(model_file, 'rb') as file:
         model = pickle.load(file)
+else:
+    st.error("Model file not found. Please make sure the file is in the same directory as this script.")
+
     
     # Streamlit app
     st.title('Risk Likelihood Prediction')
