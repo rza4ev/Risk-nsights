@@ -3,8 +3,8 @@ channels:
   - defaults
 dependencies:
   - python=3.9.12
+  - scikit-learn=1.1.1  # Example version
   - pip
   - pip:
     - streamlit
     - pandas
-    - scikit-learn
