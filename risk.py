@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd
-import pickle
+import joblib
 import os
-
 # Encoding mappings
 process_name_map = {
     'Customer Support': 0, 'Data Management': 1, 'Financial Reporting': 2, 'IT Support': 3,
@@ -38,11 +37,11 @@ process_frequency_map = {
     'Daily': 0, 'Monthly': 1, 'Quarterly': 2, 'Weekly': 3, 'Yearly': 4
 }
 
+
 model_filename = os.path.join(os.path.dirname(__file__), 'etc_model.pkl')
 
 if os.path.exists(model_filename):
-    with open(model_filename, 'rb') as file:
-        model = pickle.load(file)
+    model = joblib.load(model_filename)
 else:
     raise FileNotFoundError(f"Model file not found: {model_filename}")
 
@@ -77,6 +76,8 @@ encoded_data = [
     control_score
 ]
 
+# def dict_to_dataframe(dict):
+
 # Convert to DataFrame
 features = pd.DataFrame([encoded_data], columns=[
     'ProcessName', 'ProcessDescription', 'PotentialRisk', 'RiskImpact',
@@ -84,15 +85,8 @@ features = pd.DataFrame([encoded_data], columns=[
     'ProcessCriticality', 'RiskScore', 'ControlScore'
 ])  
 
-# Debugging information
-st.write('Feature DataFrame Shape:', features.shape)
-st.write('Model Type:', type(model))
-
 # Predict button
 if st.button('Predict Risk Likelihood'):
-    try:
-        prediction = model.predict(features)
-        st.write('Predicted Risk Likelihood:', prediction[0])
-    except Exception as e:
-        st.write('Error during prediction:', str(e))
+    prediction = model.predict(features)
+    st.write('Predicted Risk Likelihood:', prediction[0])
 
