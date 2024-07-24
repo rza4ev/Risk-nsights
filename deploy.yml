@@ -1,0 +1,32 @@
+name: Deploy Streamlit App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Conda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        miniforge-version: '4.10.3'
+        auto-update-conda: true
+        environment-file: environment.yml
+        activate-environment: myenv
+
+    - name: Install dependencies
+      run: |
+        conda env update --file environment.yml
+        conda activate myenv
+
+    - name: Run Streamlit app
+      run: |
+        conda activate myenv
+        streamlit run app.py
